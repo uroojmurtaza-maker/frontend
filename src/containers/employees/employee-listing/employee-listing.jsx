@@ -164,7 +164,6 @@ const EmployeesListing = () => {
     console.log(status);
     if (!status) return { color: 'default', className: '' };
     
-    const statusLower = status.toLowerCase();
     
     // Handle Active/Current status
     if ( status === 'Current Employee') {

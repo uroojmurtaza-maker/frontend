@@ -14,7 +14,7 @@ import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import Layout from '../../../layout/layout';
 import PageHeader from '../../../components/page-header/page-header';
 import Button from '../../../atoms/button/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useApiHandler from '../../../hooks/api-handler';
 import { useAuth } from '../../../context/authContext';
 import Spinner from '../../../atoms/spinner/spinner';
@@ -24,6 +24,8 @@ import { DESIGNATIONS, DEPARTMENTS } from '../../../constants/data';
 const { Option } = Select;
 
 const AddEmployee = () => {
+  const { id } = useParams();
+  const isEditMode = !!id;
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState(null);
@@ -31,8 +33,9 @@ const AddEmployee = () => {
   const [profilePictureUrl, setProfilePictureUrl] = useState(null);
   const [uploadLoading, setUploadLoading] = useState(false);
   const { token } = useAuth();
-  const { postData, loading, apiMessage } = useApiHandler(token);
+  const { postData, getData, putData, loading, apiMessage } = useApiHandler(token);
   const [messageApi, contextHolder] = message.useMessage();
+  const [fetchingEmployee, setFetchingEmployee] = useState(false);
 
   // Helper function to construct public URL from S3 key
   // Update these values with your actual S3 bucket details
@@ -73,6 +76,53 @@ const AddEmployee = () => {
       showError(apiMessage);
     }
   }, [apiMessage, showError]);
+
+  // Fetch employee data when in edit mode
+  useEffect(() => {
+    const fetchEmployee = async () => {
+      if (!isEditMode || !id) return;
+
+      setFetchingEmployee(true);
+      try {
+        const response = await getData(`/users/get-employee/${id}`);
+        const employee = response?.employee || response?.data || response;
+
+        if (employee) {
+          // Set form values
+          form.setFieldsValue({
+            employeeId: employee.employeeId,
+            name: employee.name,
+            email: employee.email,
+            designation: employee.designation,
+            department: employee.department,
+            phoneNumber: employee.phoneNumber,
+            salary: employee.salary,
+            dateOfBirth: employee.dateOfBirth ? dayjs(employee.dateOfBirth) : null,
+            joiningDate: employee.joiningDate ? dayjs(employee.joiningDate) : null,
+          });
+
+          // Set profile picture if available
+          const profilePic = employee.profilePicture || employee.profilePictureUrl || employee.image || employee.avatar;
+          if (profilePic) {
+            setImageUrl(profilePic);
+            setProfilePictureUrl(profilePic);
+          }
+
+          // Set profile picture key if available
+          if (employee.profilePictureKey) {
+            setProfilePictureKey(employee.profilePictureKey);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching employee:', err);
+        showError('Failed to load employee data');
+      } finally {
+        setFetchingEmployee(false);
+      }
+    };
+
+    fetchEmployee();
+  }, [id, isEditMode, getData, form, showError]);
   const getBase64 = (img, callback) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result));
@@ -170,11 +220,15 @@ const AddEmployee = () => {
         }
       });
 
-      // Call API to add employee with JSON payload (not FormData)
-      await postData('/users/create-employee', payload, false, false);
-
-      // Show success message
-      showSuccess('Employee added successfully');
+      if (isEditMode) {
+        // Update employee
+        await putData(`/users/update-employee/${id}`, payload, false);
+        showSuccess('Employee updated successfully');
+      } else {
+        // Create new employee
+        await postData('/users/create-employee', payload, false, false);
+        showSuccess('Employee added successfully');
+      }
 
       // Reset form and navigate back after a short delay
       setTimeout(() => {
@@ -185,14 +239,14 @@ const AddEmployee = () => {
         navigate('/dashboard');
       }, 1500);
     } catch (err) {
-      console.error('Error adding employee:', err);
+      console.error(`Error ${isEditMode ? 'updating' : 'adding'} employee:`, err);
     }
   };
 
   return (
     <Layout>
       {contextHolder}
-      <PageHeader title='Add Employee' onBack={() => navigate('/dashboard')} />
+      <PageHeader title={isEditMode ? 'Edit Employee' : 'Add Employee'} onBack={() => navigate('/dashboard')} />
       <div className='bg-white p-8 rounded-lg max-w-6xl mx-auto shadow-md mt-4 '>
         <div className='flex justify-center mb-8'>
           <div className='relative'>
@@ -279,11 +333,14 @@ const AddEmployee = () => {
                 name='password'
                 label='Password'
                 rules={[
-                  { required: true, message: 'Password is required' },
+                  { required: !isEditMode, message: 'Password is required' },
                   { min: 6, message: 'Password must be at least 6 characters' }
                 ]}
               >
-                <Input.Password placeholder='Enter Password' size='large' />
+                <Input.Password 
+                  placeholder={isEditMode ? 'Leave blank to keep current password' : 'Enter Password'} 
+                  size='large' 
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -389,14 +446,16 @@ const AddEmployee = () => {
               size='md'
               className='py-3 px-5'
               htmlType='submit'
-              disabled={loading}
+              disabled={loading || fetchingEmployee}
             >
-              {loading ? 'Adding...' : 'Add Employee'}
+              {loading 
+                ? (isEditMode ? 'Updating...' : 'Adding...') 
+                : (isEditMode ? 'Update Employee' : 'Add Employee')}
             </Button>
           </div>
         </Form>
       </div>
-      {(loading || uploadLoading) && <Spinner />}
+      {(loading || uploadLoading || fetchingEmployee) && <Spinner />}
     </Layout>
   );
 };

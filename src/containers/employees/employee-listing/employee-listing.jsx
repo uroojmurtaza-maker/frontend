@@ -148,6 +148,13 @@ const EmployeesListing = () => {
   // Table columns with sorting indicators
   const columns = [
     {
+      title:'Sr. No.',
+      dataIndex: 'srNo',
+      key: 'srNo',
+      render: (text, record, index) => (page - 1) * 10 + index + 1,
+      
+    },
+    {
       title: 'Employee ID',
       dataIndex: 'employeeId',
       key: 'employeeId',

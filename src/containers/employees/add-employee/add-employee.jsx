@@ -193,7 +193,7 @@ const AddEmployee = () => {
     <Layout>
       {contextHolder}
       <PageHeader title='Add Employee' onBack={() => navigate('/dashboard')} />
-      <div className='bg-white p-8 rounded-lg max-w-5xl mx-auto shadow-md'>
+      <div className='bg-white p-8 rounded-lg max-w-6xl mx-auto shadow-md mt-4 '>
         <div className='flex justify-center mb-8'>
           <div className='relative'>
             <div className='w-36 h-36 rounded-full overflow-hidden border-4 border-gray-200 bg-gray-100 flex items-center justify-center'>

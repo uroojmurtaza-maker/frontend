@@ -262,7 +262,7 @@ const EmployeesListing = () => {
             iconPosition="left"
             onClick={(e) => {
               e.stopPropagation();
-              // handleUpdate(record);
+              navigate(`/edit-employee/${record?.id}`);
             }}
             className="px-3 py-2"
           />

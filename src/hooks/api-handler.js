@@ -153,6 +153,7 @@ const useApiHandler = (token) => {
     async (url, payload = {}, isFullUrl = false) => {
       setLoading(true);
       setError(null);
+      setApiMessage("");
       try {
         const fullUrl = isFullUrl ? url : `${BASE_URL}${url}`;
         const response = await axios.delete(fullUrl, {
@@ -166,7 +167,14 @@ const useApiHandler = (token) => {
         return response.data;
       } catch (err) {
         setError(true);
-        setApiMessage(err?.response?.data?.message || "DELETE request failed");
+        const errorMessage = err?.response?.data?.message || err?.message || "DELETE request failed";
+        setApiMessage(errorMessage);
+        console.error("DELETE request error:", {
+          url: isFullUrl ? url : `${BASE_URL}${url}`,
+          error: err?.response?.data || err?.message,
+          status: err?.response?.status,
+        });
+        throw err; // ✅ rethrow so the outer try/catch can handle it
       } finally {
         setLoading(false);
       }

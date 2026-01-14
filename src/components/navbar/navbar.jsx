@@ -65,7 +65,7 @@ const Header = () => {
         newPassword: values.newPassword
       };
 
-      await putData('/auth/change-password', data, false, false);
+      await putData('/auth/update-password', data, false, false);
       showSuccess('Password changed successfully!');
       setChangePasswordModalOpen(false);
       changePasswordForm.resetFields();

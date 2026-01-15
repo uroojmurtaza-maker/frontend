@@ -507,6 +507,8 @@ const AddEmployee = () => {
                 ? isEditMode
                   ? 'Updating...'
                   : 'Adding...'
+                : isEditMode && myProfile
+                ? 'Update Profile'
                 : isEditMode
                 ? 'Update Employee'
                 : 'Add Employee'}

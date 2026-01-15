@@ -146,7 +146,7 @@ const EmployeeProfile = () => {
         actionButton={[
           {
             label: 'Edit Profile',
-            onClick: () => navigate(`/edit-employee/${myProfile ? user?.id : id}`)
+            onClick: () => navigate(`/edit-profile/${myProfile ? user?.id : id}`)
           }
         ]}
       />

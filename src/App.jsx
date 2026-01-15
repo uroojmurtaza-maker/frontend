@@ -19,6 +19,7 @@ function App() {
       <Route path="/edit-employee/:id" element={<EditEmployee />} />
       <Route path="/employee-profile/:id" element={<EmployeeProfile />} />
       <Route path="/profile" element={<EmployeeProfile />} />
+      <Route path="/edit-profile/:id" element={<EditEmployee />} />
      </Routes>
     </>
   )

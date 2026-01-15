@@ -9,12 +9,15 @@ const getInitialAuthState = () => {
   try {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
+    const storedMyProfile = localStorage.getItem('myProfile');
+    
 
     if (storedToken && storedUser) {
       return {
         token: storedToken,
         user: JSON.parse(storedUser),
         isAuthenticated: true,
+        myProfile: storedMyProfile === 'true', // Convert string to boolean
       };
     }
   } catch (error) {
@@ -22,12 +25,14 @@ const getInitialAuthState = () => {
     // Clean up corrupted data
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('myProfile');
   }
 
   return {
     token: null,
     user: null,
     isAuthenticated: false,
+    myProfile: false,
   };
 };
 
@@ -37,8 +42,15 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(initialState.token);
   const [isAuthenticated, setIsAuthenticated] = useState(initialState.isAuthenticated);
   const [error, setError] = useState(null);
+  const [myProfile, setMyProfile] = useState(initialState.myProfile);
 
   const navigate = useNavigate();
+
+  // Persist myProfile to localStorage whenever it changes
+  const handleSetMyProfile = (value) => {
+    setMyProfile(value);
+    localStorage.setItem('myProfile', String(value));
+  };
 
   // Login: sets user + token + isAuthenticated
   const login = (userData, newToken) => {
@@ -57,9 +69,11 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setIsAuthenticated(false);
     setError(null);
+    setMyProfile(false);
 
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('myProfile');
     navigate('/login');
   };
 
@@ -79,12 +93,15 @@ export const AuthProvider = ({ children }) => {
     token,
     isAuthenticated,
     error,
+    myProfile,
+
 
     // Setters
     setUser,             // ← you can now use this directly
     setToken,
     setIsAuthenticated,
     setError,
+    setMyProfile: handleSetMyProfile, // Use the persisted setter
 
     // Helper functions
     login,

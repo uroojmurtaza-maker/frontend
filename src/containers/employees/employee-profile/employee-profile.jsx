@@ -8,7 +8,7 @@ import {
   DollarOutlined,
   IdcardOutlined,
   EditOutlined,
-  TeamOutlined,
+  TeamOutlined
   // BriefcaseOutlined,
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -23,7 +23,7 @@ import dayjs from 'dayjs';
 const EmployeeProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, myProfile, setMyProfile, user } = useAuth();
   const { getData, loading, apiMessage } = useApiHandler(token);
   const [messageApi, contextHolder] = message.useMessage();
   const [employee, setEmployee] = useState(null);
@@ -33,7 +33,7 @@ const EmployeeProfile = () => {
     (msg) => {
       messageApi.open({
         type: 'error',
-        content: msg,
+        content: msg
       });
     },
     [messageApi]
@@ -47,11 +47,11 @@ const EmployeeProfile = () => {
 
   useEffect(() => {
     const fetchEmployee = async () => {
-      if (!id) return;
+      const apiUrl = myProfile ? `/users/get-profile` : `/users/get-employee/${id}`;
 
       setFetching(true);
       try {
-        const response = await getData(`/users/get-employee/${id}`);
+        const response = await getData(apiUrl);
         const employeeData = response?.employee || response?.data || response;
         setEmployee(employeeData);
       } catch (err) {
@@ -63,7 +63,7 @@ const EmployeeProfile = () => {
     };
 
     fetchEmployee();
-  }, [id, getData, showError]);
+  }, [id, getData, showError, myProfile, user?.id]);
 
   if (fetching || loading) {
     return (
@@ -79,11 +79,11 @@ const EmployeeProfile = () => {
       <Layout>
         {contextHolder}
         <PageHeader
-          title="Employee Profile"
+          title='Employee Profile'
           onBack={() => navigate('/dashboard')}
         />
-        <div className="bg-white p-8 rounded-lg shadow-md mt-4 text-center">
-          <p className="text-gray-500 text-lg">Employee not found</p>
+        <div className='bg-white p-8 rounded-lg shadow-md mt-4 text-center'>
+          <p className='text-gray-500 text-lg'>Employee not found</p>
         </div>
       </Layout>
     );
@@ -104,7 +104,7 @@ const EmployeeProfile = () => {
     if (!amount) return '----';
     return `$${parseFloat(amount).toLocaleString('en-US', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 2
     })}`;
   };
 
@@ -117,13 +117,17 @@ const EmployeeProfile = () => {
   };
 
   const InfoItem = ({ icon, label, value, className = '' }) => (
-    <div className={`flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 ${className}`}>
-      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+    <div
+      className={`flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 ${className}`}
+    >
+      <div className='flex-shrink-0 w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600'>
         {icon}
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-gray-500 mb-1">{label}</p>
-        <p className="text-base font-medium text-gray-900 break-words">{value}</p>
+      <div className='flex-1 min-w-0'>
+        <p className='text-sm text-gray-500 mb-1'>{label}</p>
+        <p className='text-base font-medium text-gray-900 break-words'>
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -132,46 +136,54 @@ const EmployeeProfile = () => {
     <Layout>
       {contextHolder}
       <PageHeader
-        title="Employee Profile"
-        onBack={() => navigate('/dashboard')}
+        title={myProfile ? 'Profile' : 'Employee Profile'}
+        onBack={() => {
+          // if (myProfile) {
+          //  setMyProfile(false);
+          // } 
+          navigate('/dashboard');
+        }}
         actionButton={[
           {
             label: 'Edit Profile',
-            onClick: () => navigate(`/edit-employee/${id}`),
-          },
+            onClick: () => navigate(`/edit-employee/${myProfile ? user?.id : id}`)
+          }
         ]}
       />
 
-      <div className="max-w-6xl mx-auto mt-6">
+      <div className='max-w-6xl mx-auto mt-6'>
         {/* Profile Header Card */}
-        <Card className="shadow-md mb-6 border-0">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="relative">
+        <Card className='shadow-md mb-6 border-0'>
+          <div className='flex flex-col md:flex-row items-center md:items-start gap-6'>
+            <div className='relative'>
               <Avatar
                 src={profilePicture}
                 icon={<UserOutlined />}
                 size={140}
-                className="border-4 border-gray-200"
+                className='border-4 border-gray-200'
               />
             </div>
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 capitalize">
+            <div className='flex-1 text-center md:text-left'>
+              <h1 className='text-3xl font-bold text-gray-900 mb-2 capitalize'>
                 {employee.name || '----'}
               </h1>
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4">
-                <Tag color="blue" className="text-sm px-3 py-1">
+              <div className='flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4'>
+                <Tag color='blue' className='text-sm px-3 py-1'>
                   {employee.designation || '----'}
                 </Tag>
-                <Tag color="purple" className="text-sm px-3 py-1">
+                <Tag color='purple' className='text-sm px-3 py-1'>
                   {employee.department || '----'}
                 </Tag>
                 {employee.status && (
-                  <Tag color={getStatusColor(employee.status)} className="text-sm px-3 py-1">
+                  <Tag
+                    color={getStatusColor(employee.status)}
+                    className='text-sm px-3 py-1'
+                  >
                     {employee.status}
                   </Tag>
                 )}
               </div>
-              <p className="text-gray-600 flex items-center justify-center md:justify-start gap-2">
+              <p className='text-gray-600 flex items-center justify-center md:justify-start gap-2'>
                 <MailOutlined />
                 <span>{employee.email || '----'}</span>
               </p>
@@ -180,35 +192,37 @@ const EmployeeProfile = () => {
         </Card>
 
         {/* Information Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
           {/* Personal Information */}
           <Card
             title={
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 {/* <UserOutlined className="text-blue-600" /> */}
-                <span className="text-lg font-semibold">Personal Information</span>
+                <span className='text-lg font-semibold'>
+                  Personal Information
+                </span>
               </div>
             }
-            className="shadow-md border-0"
+            className='shadow-md border-0'
           >
             <InfoItem
               icon={<IdcardOutlined />}
-              label="Employee ID"
+              label='Employee ID'
               value={employee.employeeId || '----'}
             />
             <InfoItem
               icon={<CalendarOutlined />}
-              label="Date of Birth"
+              label='Date of Birth'
               value={formatDate(employee.dateOfBirth)}
             />
             <InfoItem
               icon={<PhoneOutlined />}
-              label="Phone Number"
+              label='Phone Number'
               value={employee.phoneNumber || '----'}
             />
             <InfoItem
               icon={<MailOutlined />}
-              label="Email Address"
+              label='Email Address'
               value={employee.email || '----'}
             />
           </Card>
@@ -216,31 +230,31 @@ const EmployeeProfile = () => {
           {/* Work Information */}
           <Card
             title={
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 {/* <BriefcaseOutlined className="text-blue-600" /> */}
-                <span className="text-lg font-semibold">Work Information</span>
+                <span className='text-lg font-semibold'>Work Information</span>
               </div>
             }
-            className="shadow-md border-0"
+            className='shadow-md border-0'
           >
             <InfoItem
               icon={<TeamOutlined />}
-              label="Department"
+              label='Department'
               value={employee.department || '----'}
             />
             <InfoItem
               icon={<UserOutlined />}
-              label="Designation"
+              label='Designation'
               value={employee.designation || '----'}
             />
             <InfoItem
               icon={<CalendarOutlined />}
-              label="Joining Date"
+              label='Joining Date'
               value={formatDate(employee.joiningDate)}
             />
             <InfoItem
               icon={<DollarOutlined />}
-              label="Salary"
+              label='Salary'
               value={formatCurrency(employee.salary)}
             />
           </Card>
@@ -248,13 +262,13 @@ const EmployeeProfile = () => {
 
         {/* Status Card (if status exists) */}
         {employee.status && (
-          <Card className="shadow-md border-0 mt-6">
-            <div className="flex items-center justify-between">
+          <Card className='shadow-md border-0 mt-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm text-gray-500 mb-1">Employment Status</p>
+                <p className='text-sm text-gray-500 mb-1'>Employment Status</p>
                 <Tag
                   color={getStatusColor(employee.status)}
-                  className="text-base px-4 py-1.5"
+                  className='text-base px-4 py-1.5'
                 >
                   {employee.status}
                 </Tag>

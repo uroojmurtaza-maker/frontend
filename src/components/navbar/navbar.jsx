@@ -8,7 +8,16 @@ import {
   DownOutlined,
   UserOutlined
 } from '@ant-design/icons';
-import { Dropdown, Avatar, Space, message, Modal, Form, Input, Button } from 'antd';
+import {
+  Dropdown,
+  Avatar,
+  Space,
+  message,
+  Modal,
+  Form,
+  Input,
+  Button
+} from 'antd';
 import Spinner from '../../atoms/spinner/spinner';
 import useApiHandler from '../../hooks/api-handler';
 import { useAuth } from '../../context/authContext';
@@ -18,7 +27,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const [changePasswordForm] = Form.useForm();
-  const { user, token } = useAuth();
+  const { user, token,setMyProfile } = useAuth();
 
   const { postData, putData, loading, apiMessage } = useApiHandler(token);
 
@@ -95,14 +104,11 @@ const Header = () => {
   };
 
   const items = [
-    
     {
       key: '0',
       label: (
-          <Link to={'/profile'}>
-          <div
-            className='flex items-center gap-2 text-gray-700 hover:text-primary'
-          >
+        <Link to={'/profile'} onClick={() => setMyProfile(true)}>
+          <div className='flex items-center gap-2 text-gray-700 hover:text-primary'>
             <UserOutlined /> Profile
           </div>
         </Link>
@@ -132,8 +138,6 @@ const Header = () => {
     }
   ];
 
- 
-
   return (
     <div>
       {contextHolder}
@@ -148,9 +152,9 @@ const Header = () => {
               className='w-[2rem] md:w-[2.5rem] h-auto object-contain cursor-pointer'
               src={'https://cdn-icons-png.flaticon.com/512/4661/4661334.png'}
               alt='Logo'
-              onClick={() => router('/')}
+              onClick={() => router('/dashboard')}
             />
-            <div className='text-center text-xl font-semibold'>Admin Panel</div>
+            <div className='text-center text-xl font-semibold'>{user?.role === 'admin' ? 'Admin' : 'Employee'} Panel</div>
           </div>
           {/* Mobile Menu Button */}
           <div className='md:hidden'>
@@ -170,10 +174,7 @@ const Header = () => {
               arrow
             >
               <button className='flex items-center gap-2 bg-white border border-gray-200 rounded-full px-5 py-1.5 shadow-sm hover:bg-gray-50 transition'>
-                <Avatar
-                  src={user?.profileImageUrl}
-                  size={40}
-                />
+                <Avatar src={user?.profileImageUrl} size={40} />
                 <div className='flex flex-col text-left leading-tight mr-2'>
                   <span className='text-gray-800 text-sm font-medium'>
                     {user?.name || 'User Name'}
@@ -223,11 +224,9 @@ const Header = () => {
             </button>
           </div>
 
-        {/* Menu Links */}
-        <nav className='flex-1 overflow-y-auto'>
+          {/* Menu Links */}
+          <nav className='flex-1 overflow-y-auto'>
             <ul className='px-6 py-4 space-y-4'>
-             
-
               {/* Profile-related Options inside menu for mobile */}
               {items?.map((opt) => (
                 <li key={opt?.key}>
@@ -239,9 +238,6 @@ const Header = () => {
             </ul>
           </nav>
 
-          
-
-
           {/* Footer (User Info) */}
           <div className='border-t border-gray-200 px-6 py-4 flex items-center gap-3'>
             <Avatar src={user?.profileImageUrl} size={50} />
@@ -249,11 +245,13 @@ const Header = () => {
               <div className='text-gray-800 font-medium text-sm'>
                 {user?.name || 'User Name'}
               </div>
-              <div className='text-gray-500 text-xs'>{user?.role
-                      ? user.role
-                          .replace(/[-_]/g, ' ')
-                          .replace(/\b\w/g, (char) => char.toUpperCase())
-                      : 'User'}</div>
+              <div className='text-gray-500 text-xs'>
+                {user?.role
+                  ? user.role
+                      .replace(/[-_]/g, ' ')
+                      .replace(/\b\w/g, (char) => char.toUpperCase())
+                  : 'User'}
+              </div>
             </div>
           </div>
         </div>
@@ -261,7 +259,7 @@ const Header = () => {
 
       {/* Change Password Modal */}
       <Modal
-        title="Change Password"
+        title='Change Password'
         open={changePasswordModalOpen}
         onCancel={() => {
           setChangePasswordModalOpen(false);
@@ -272,42 +270,42 @@ const Header = () => {
       >
         <Form
           form={changePasswordForm}
-          layout="vertical"
+          layout='vertical'
           onFinish={handleChangePassword}
-          className="mt-4"
+          className='mt-4'
         >
           <Form.Item
-            name="oldPassword"
-            label="Old Password"
+            name='oldPassword'
+            label='Old Password'
             rules={[
               { required: true, message: 'Please enter your old password!' }
             ]}
           >
             <Input.Password
-              placeholder="Enter old password"
-              className="w-full"
+              placeholder='Enter old password'
+              className='w-full'
               size='large'
             />
           </Form.Item>
 
           <Form.Item
-            name="newPassword"
-            label="New Password"
+            name='newPassword'
+            label='New Password'
             rules={[
               { required: true, message: 'Please enter your new password!' },
               { min: 6, message: 'Password must be at least 6 characters!' }
             ]}
           >
             <Input.Password
-              placeholder="Enter new password"
-              className="w-full"
+              placeholder='Enter new password'
+              className='w-full'
               size='large'
             />
           </Form.Item>
 
           <Form.Item
-            name="confirmPassword"
-            label="Confirm New Password"
+            name='confirmPassword'
+            label='Confirm New Password'
             dependencies={['newPassword']}
             rules={[
               { required: true, message: 'Please confirm your new password!' },
@@ -316,20 +314,22 @@ const Header = () => {
                   if (!value || getFieldValue('newPassword') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('The two passwords do not match!'));
+                  return Promise.reject(
+                    new Error('The two passwords do not match!')
+                  );
                 }
               })
             ]}
           >
             <Input.Password
-              placeholder="Confirm new password"
-              className="w-full"
+              placeholder='Confirm new password'
+              className='w-full'
               size='large'
             />
           </Form.Item>
 
-          <Form.Item className="mb-0 mt-6">
-            <div className="flex justify-end gap-3">
+          <Form.Item className='mb-0 mt-6'>
+            <div className='flex justify-end gap-3'>
               <Button
                 onClick={() => {
                   setChangePasswordModalOpen(false);
@@ -339,10 +339,10 @@ const Header = () => {
                 Cancel
               </Button>
               <Button
-                type="primary"
-                htmlType="submit"
+                type='primary'
+                htmlType='submit'
                 loading={loading}
-                className="bg-primary hover:bg-[#E1AB20]"
+                className='bg-primary hover:bg-[#E1AB20]'
               >
                 Change Password
               </Button>

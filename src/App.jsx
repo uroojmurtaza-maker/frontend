@@ -2,10 +2,11 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import Login from './containers/login/login'
-import Dashboard from './containers/dashboard/dashboard'
 import AddEmployee from './containers/employees/add-employee/add-employee'
 import EditEmployee from './containers/employees/add-employee/add-employee'
 import EmployeeProfile from './containers/employees/employee-profile/employee-profile'
+import EmployeesListing from './containers/employees/employee-listing/employee-listing'
+
 
 function App() {
 
@@ -13,10 +14,11 @@ function App() {
     <>
      <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<EmployeesListing />} />
       <Route path="/add-employee" element={<AddEmployee />} />
       <Route path="/edit-employee/:id" element={<EditEmployee />} />
       <Route path="/employee-profile/:id" element={<EmployeeProfile />} />
+      <Route path="/profile" element={<EmployeeProfile />} />
      </Routes>
     </>
   )

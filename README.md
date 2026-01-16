@@ -1,16 +1,34 @@
-# React + Vite
+# OMS Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Employee management frontend built with React, Vite, Tailwind CSS, and Ant Design.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 18+ (recommended)
+- npm (comes with Node)
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Install dependencies:
+   - `npm install`
 
-## Expanding the ESLint configuration
+2. Configure environment variables:
+   - Create a `.env` file in the project root.
+   - Add the API base URL:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```
+VITE_API_URL=http://localhost:5000/api
+```
+
+This project reads `VITE_API_URL` in `src/hooks/api-handler.js`.
+
+## Run the app
+
+- Start the dev server: `npm run dev`
+- Build for production: `npm run build`
+- Preview production build: `npm run preview`
+- Lint: `npm run lint`
+
+## Notes
+
+- Ensure the backend API is running and reachable at `VITE_API_URL`.
